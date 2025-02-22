@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id            Int      @id @default(autoincrement())
+  email              String   @unique
+  password           String    
+  role               String  //Admin; Teacher; Student
+  account_status     String  //Activated; New; Disabled
+  userDetails        UserDetails? @relation(name: "UserToUserDetails") // ✅ Define relation name here only
+}
+
+model UserDetails {
+  user_id           Int @unique  
+  name              String
+  course            String?  //if Student -- N/A if teacher and admin
+  online_status     String  //Active; Inactive
+  profile_image     Bytes?
+  user              User @relation(name: "UserToUserDetails", fields: [user_id], references: [user_id]) // ✅ Define relation only here
+}
+
+model ClassInformation {
+  id                    Int @id @default(autoincrement()) 
+  name                  String
+  description           String
+  date_schedule         String
+  teacher_user_id       Int  //user_id from UserDetails Table
+}
+
+model ClassStudents {  
+  id                 Int @id @default(autoincrement()) 
+  class_id           Int @unique
+  student_id         Int  //user_id from UserDetails Table  
+}
+
+model ClassSchedule {
+  id                   Int @id @default(autoincrement())
+  class_id             Int
+  date_schedule        String 
+  time_start           String
+  time_end             String  
+  status               String //Open; Upcoming; Closed; Canceled
+}
+
+model ClassLessonPlan {
+  id                    Int @id @default(autoincrement())   
+  class_id              Int @unique
+  start_time            String
+  title                 String  
+  description           String
+  status                String //Upcoming; Completed
+}
+
+model ClassAttendance {  
+  id                 Int @id @default(autoincrement())   
+  classs_id          Int @unique
+  student_id         Int
+  time_in            DateTime
+  time_out           DateTime
+  status             String //attended; absent
+}
+
+model ClassStudentFER {  
+  id                 Int @id @default(autoincrement())   
+  classsched_id      Int  @unique
+  student_id         Int  //user_id from UserDetails Table
+  surprised          Decimal
+  happy              Decimal
+  neutral            Decimal
+  sad                Decimal
+  angry              Decimal
+  disgusted          Decimal
+  fearful            Decimal
+  result             String // surprised; happy; neutral; sad; angry; disgusted; fearful;
+  remarks            String // Face_Expression_Detected; No_Face_Expression_Detected;
+  datetime_stamp     DateTime @default(now())  
+}
+
+model Notification {
+  id                  Int @id @default(autoincrement())
+  datetime_stamp      DateTime @default(now())
+  title               String
+  message             String
+  user_id             Int
+  color_code          String // 0 Green = Good; 1 Yellow = Warning; 2 Red = Critical;
+  status              Int //0 - Unread; 1 - Read
+}
