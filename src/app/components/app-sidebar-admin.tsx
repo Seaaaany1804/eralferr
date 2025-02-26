@@ -33,6 +33,13 @@ const data = {
       items: [],
     },
     {
+      title: "Class Management",
+      url: "/admin/class-management",
+      icon: BookCopy,
+      isActive: true,
+      items: [],
+    },
+    {
         title: "User Management",
         url: "/admin/user-management",
         icon: Users,

@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { ExpressionCharts } from "@/components/expression-charts";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TopClassesCard } from "@/components/top-classes-card";
 
 export default function Page() {
   // Previous state definitions remain the same until topClasses
@@ -154,41 +155,11 @@ export default function Page() {
                 </Card>
 
                 {/* For Top Classes Card */}
-                <Card className="col-span-1 shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <h2 className="text-xl font-semibold mb-4">Top Classes with Positive Expressions</h2>
-                    <ScrollArea className="h-[500px] pr-4">
-                      <div className="space-y-4">
-                        {topClasses.map((classItem) => (
-                          <Card key={classItem.id}>
-                            <CardContent className="p-4 bg-gray-50">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="font-medium">{classItem.name}</p>
-                                  <p className="text-sm text-gray-600">{classItem.students} students enrolled</p>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-xl">😊</span>
-                                    <span>{classItem.emotions.happy}%</span>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-xl">😲</span>
-                                    <span>{classItem.emotions.surprised}%</span>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-xl">😐</span>
-                                    <span>{classItem.emotions.neutral}%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>                                
+                <TopClassesCard 
+                  title="Top Classes with Positive Expressions"
+                  classes={topClasses}
+                  showEnrollment={true}
+                />
             </div>
           </div>          
         </div>

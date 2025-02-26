@@ -25,16 +25,47 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { useEffect, useState } from "react"
+import { LessonPlan, TimelineItem } from "@/components/lesson-plan";
 
 export default function Subject() {
   const [studentToRemove, setStudentToRemove] = useState<number | null>(null);
 
-  const timelineItems = [
-    { time: "8:00AM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-    { time: "9:00AM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-    { time: "10:00AM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-    { time: "2:00PM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-    { time: "3:00PM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." }
+  const timelineItems: TimelineItem[] = [
+    {
+      time: "10:00 AM - 10:15 AM",
+      title: "Introduction and Overview",
+      desc: "Welcome and introduction to today's topics",
+      completed: true,
+      current: false,
+    },
+    {
+      time: "10:15 AM - 10:35 AM",
+      title: "Control Structures - If/Else",
+      desc: "Understanding conditional logic and decision making in programming",
+      completed: false,
+      current: true,
+    },
+    {
+      time: "10:35 AM - 10:55 AM",
+      title: "Control Structures - Loops",
+      desc: "Exploring for loops, while loops, and iterative processes",
+      completed: false,
+      current: false,
+    },
+    {
+      time: "10:55 AM - 11:20 AM",
+      title: "Practice Exercises",
+      desc: "Hands-on exercises to implement control structures",
+      completed: false,
+      current: false,
+    },
+    {
+      time: "11:20 AM - 11:30 AM",
+      title: "Summary and Assignment",
+      desc: "Recap of key concepts and overview of homework assignment",
+      completed: false,
+      current: false,
+    },
   ];
 
   const notifications = [
@@ -212,36 +243,7 @@ export default function Subject() {
                   </Card> 
 
                   {/* Lesson Plan */}
-                  <Card className="cols-span-3 shadow-lg">
-                    <CardContent className="p-4 sm:p-4 lg:p-6">
-                      <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-center">Lesson Plan</h2>
-                      <div className="overflow-y-auto max-h-[350px] sm:max-h-[400px] lg:max-h-[270px]">
-                        <div className="space-y-16 sm:space-y-24 lg:space-y-32 px-2 sm:px-4">
-                          {timelineItems.map((item, index) => (
-                            <div key={index} className="relative">
-                              <div className="bg-black text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm w-fit">
-                                {item.time}
-                              </div>
-                              
-                              <div className="absolute left-16 sm:left-20 lg:left-24 top-0 h-full">
-                                <div className="relative h-full">
-                                  <div className="absolute top-3 w-2 h-2 bg-black rounded-full"></div>
-                                  {index !== timelineItems.length - 1 && (
-                                    <div className="absolute top-4 left-1 w-0.5 h-[100px] sm:h-[125px] lg:h-[153px] bg-black"></div>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="absolute left-24 sm:left-28 lg:left-32 top-1 flex flex-col max-w-[150px] sm:max-w-[200px] lg:max-w-none">
-                                <span className="text-xs sm:text-sm text-gray-600">{item.title}</span>
-                                <span className="text-xs sm:text-sm text-gray-800 line-clamp-3 sm:line-clamp-4">{item.desc}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <LessonPlan items={timelineItems} />
                 </div>
               </div>
             </div>

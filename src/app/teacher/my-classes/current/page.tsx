@@ -67,7 +67,8 @@ export default function Page() {
       image: "/images/subject-image.png",
       status: "ongoing",
       teacherId: "teacher123",
-      classId: "D-CP-103"
+      classId: "D-CP-103",
+      isScheduled: false
     },
   ];
 

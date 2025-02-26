@@ -1,15 +1,14 @@
 "use client";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebarTeacher } from "@/app/components/app-sidebar-teacher"
-import { Card, CardContent } from "@/components/ui/card";
+
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { Separator } from "@radix-ui/react-separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar } from "@/components/ui/avatar";
-import { AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExpressionCharts } from "@/components/expression-charts";
+import { TopTenCard } from "@/components/top-ten-card";
+import { TopStudents } from "@/components/top-students";
 
 export default function Page() {
     const [moods] = useState([
@@ -33,14 +32,6 @@ export default function Page() {
         { name: "Art Class", happiness: "72", students: 20 },
         { name: "Music Theory", happiness: "70", students: 24 },
         { name: "Physical Education", happiness: "69", students: 33 },
-    ];
-
-    const currentStudents = [
-        { name: "Alice Johnson", id: "STU001", course: "Mathematics 101" },
-        { name: "Bob Smith", id: "STU002", course: "Physics Advanced" },
-        { name: "Carol White", id: "STU003", course: "Chemistry Lab" },
-        { name: "David Brown", id: "STU004", course: "Biology 201" },
-        { name: "Eve Wilson", id: "STU005", course: "Computer Science" },
     ];
 
     const [, setCurrentTime] = useState(new Date());  
@@ -80,59 +71,12 @@ export default function Page() {
                     <div className="h-full flex flex-col gap-2 sm:gap-4">
                         <ExpressionCharts moods={moods} />
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-5 flex-1">
-                            <Card className="col-span-1 shadow-lg overflow-hidden h-[60vh] sm:h-[65vh]">
-                                <CardContent className="p-3 sm:p-6 h-full flex flex-col">                      
-                                    <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Current Students</h2>
-                                    <ScrollArea className="flex-1">
-                                        <div className="space-y-2 sm:space-y-4 pr-2 sm:pr-4">
-                                            {currentStudents.map((student, index) => (
-                                                <Card key={index} className="shadow-sm">
-                                                    <CardContent className="p-2 sm:p-4">
-                                                        <div className="flex items-center space-x-2 sm:space-x-4 p-2 sm:p-3 rounded-lg">
-                                                            <Avatar>
-                                                                <AvatarImage src={`/api/placeholder/32/32`} />
-                                                                <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                                            </Avatar>
-                                                            <div className="flex-1 min-w-0">
-                                                                <p className="font-medium text-sm sm:text-base truncate">{student.name}</p>
-                                                                <p className="text-xs sm:text-sm text-gray-500 truncate">ID: {student.id}</p>
-                                                                <p className="text-xs sm:text-sm text-gray-500 truncate">{student.course}</p>
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-                                        </div>
-                                    </ScrollArea>
-                                </CardContent>
-                            </Card>
-                            <Card className="col-span-1 shadow-lg overflow-hidden h-[60vh] sm:h-[65vh]">
-                                <CardContent className="p-3 sm:p-6 h-full flex flex-col">
-                                    <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Top 10 Classes with Positive Expression</h2>
-                                    <ScrollArea className="flex-1">
-                                        <div className="grid grid-cols-1 gap-2 sm:gap-4 pr-2 sm:pr-4">
-                                            {positiveClasses.map((class_, index) => (
-                                                <Card key={index} className="shadow-sm">
-                                                    <CardContent className="p-2 sm:p-4">
-                                                        <div className="flex justify-between items-center">
-                                                            <div className="flex-1 min-w-0 mr-2">
-                                                                <h3 className="font-medium text-sm sm:text-base truncate">{class_.name}</h3>
-                                                                <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">{class_.students} students</p>
-                                                            </div>
-                                                            <div className="flex flex-col items-center">
-                                                                <span className="text-green-600 font-medium text-base sm:text-lg whitespace-nowrap">
-                                                                    {class_.happiness}%
-                                                                </span>
-                                                                <h1 className="text-xs sm:text-sm text-gray-500 mt-1">Happy</h1>
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-                                        </div>
-                                    </ScrollArea>
-                                </CardContent>
-                            </Card>                                
+                            <TopStudents />
+                            <TopTenCard
+                                title="Top 10 Classes with Positive Expression"
+                                type="classes"
+                                data={positiveClasses}
+                            />
                         </div>
                     </div>          
                 </div>

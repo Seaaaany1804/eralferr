@@ -3,13 +3,11 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Clock } from "lucide-react";
+import { Clock, Search, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { X, Search } from "lucide-react";
 
 export interface Subject {
   id: number;
@@ -22,6 +20,7 @@ export interface Subject {
   status: string;
   classId: string;
   teacherId?: string;
+  isScheduled: boolean;
 }
 
 interface SubjectCardProps {
@@ -35,6 +34,7 @@ interface Student {
   name: string;
   grade: string;
   section: string;
+  course?: string;
 }
 
 export const SubjectCard = ({ subject, variant, onViewStudents }: SubjectCardProps) => {
@@ -46,8 +46,10 @@ export const SubjectCard = ({ subject, variant, onViewStudents }: SubjectCardPro
     { id: 8, name: "Michael Chen", grade: "Grade 10", section: "B" },
     { id: 9, name: "Sarah Johnson", grade: "Grade 10", section: "C" },
   ]);
+  const [originalStudents, setOriginalStudents] = useState<Student[]>([]);
   const [studentToRemove, setStudentToRemove] = useState<Student | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const availableStudents = [
     { id: 1, name: "Emma Wilson", grade: "Grade 10", section: "A" },
@@ -91,6 +93,69 @@ export const SubjectCard = ({ subject, variant, onViewStudents }: SubjectCardPro
     router.push(`${basePath}/my-classes/current/${variant === "student" ? subject.classId : subject.teacherId}`);
   };
 
+  const handleDialogOpen = (open: boolean) => {
+    if (open) {
+      // Store original students to allow cancellation
+      setOriginalStudents([...currentStudents]);
+    } else {
+      // Reset to original if dialog is closed without saving
+      setCurrentStudents([...originalStudents]);
+    }
+    setIsModalOpen(open);
+  };
+
+  const handleSaveStudents = async () => {
+    setIsSaving(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update original students with current selection
+      setOriginalStudents([...currentStudents]);
+      
+      // Show success toast or notification
+      console.log("Students saved successfully:", currentStudents);
+      
+      // Close the dialog
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error saving students:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const checkIfCurrentTime = (timeRange: string) => {
+    const [start, end] = timeRange.split(' - ');
+    const now = new Date();
+    
+    const startTime = new Date();
+    const endTime = new Date();
+    
+    // Handle AM/PM conversion
+    const startParts = start.match(/(\d+):?(\d+)?([AP]M)/);
+    const endParts = end.match(/(\d+):?(\d+)?([AP]M)/);
+    
+    if (!startParts || !endParts) return false;
+    
+    let startHour = parseInt(startParts[1]);
+    if (startParts[3] === 'PM' && startHour !== 12) startHour += 12;
+    if (startParts[3] === 'AM' && startHour === 12) startHour = 0;
+    
+    let endHour = parseInt(endParts[1]);
+    if (endParts[3] === 'PM' && endHour !== 12) endHour += 12;
+    if (endParts[3] === 'AM' && endHour === 12) endHour = 0;
+    
+    startTime.setHours(startHour, parseInt(startParts[2] || '0'), 0);
+    endTime.setHours(endHour, parseInt(endParts[2] || '0'), 0);
+    
+    return now >= startTime && now <= endTime;
+  };
+
+  const isCurrentTime = checkIfCurrentTime(subject.time);
+  const isJoinable = subject.isScheduled && isCurrentTime;
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="p-0">
@@ -102,9 +167,10 @@ export const SubjectCard = ({ subject, variant, onViewStudents }: SubjectCardPro
           />
           <button 
             onClick={handleJoin}
+            disabled={!isJoinable}
             className={`absolute top-3 right-3 ${
-              subject.status === 'ongoing' ? 'bg-white' : 'bg-gray-500'
-            } text-black font-bold px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-gray-100 transition-colors`}
+              isJoinable ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'
+            } text-white font-bold px-3 py-1 rounded-full text-sm transition-colors`}
           >
             Join
           </button>
@@ -135,103 +201,144 @@ export const SubjectCard = ({ subject, variant, onViewStudents }: SubjectCardPro
             >
               Details
             </Button>
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1">
-                  {variant === "student" ? "View Schedule" : "View Students"}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>
-                    {variant === "student" ? "Class Schedule" : "Manage Students"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {variant === "student" 
-                      ? `Weekly schedule for ${subject.title} - ${subject.code}`
-                      : `Add or remove students from ${subject.title}`}
-                  </DialogDescription>
-                </DialogHeader>
-                {variant === "student" ? (
-                  <div className="space-y-4">
-                    <div className="grid gap-3">
-                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-                        <div key={day} className="flex items-center p-3 border rounded-lg">
-                          <div className="w-24 font-medium">{day}</div>
-                          <div className="flex items-center gap-2 text-sm">
-                            <Clock size={16} className="text-gray-500" />
-                            {day === 'Monday' || day === 'Thursday' ? (
-                              <span>{subject.time}</span>
-                            ) : (
-                              <span className="text-gray-500">No class</span>
-                            )}
-                          </div>
+            {variant === "teacher" && (
+              <Dialog open={isModalOpen} onOpenChange={handleDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex-1">
+                    View Students
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Manage Students</DialogTitle>
+                    <DialogDescription>
+                      Add or remove students from {subject.title}
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="grid grid-cols-1 gap-6 mt-4">
+                    {/* Current Students Section */}
+                    <div className="bg-white rounded-lg border p-4">
+                      <h3 className="text-lg font-semibold mb-4">Current Students</h3>
+                      
+                      {currentStudents.length === 0 ? (
+                        <p className="text-gray-500 italic">No students added yet</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Name</th>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Grade</th>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Section</th>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {currentStudents.map((student) => (
+                                <tr key={student.id} className="border-b hover:bg-gray-50">
+                                  <td className="px-4 py-3">{student.name}</td>
+                                  <td className="px-4 py-3">{student.grade}</td>
+                                  <td className="px-4 py-3">Section {student.section}</td>
+                                  <td className="px-4 py-3">
+                                    <button 
+                                      onClick={() => handleRemoveInitiate(student)}
+                                      className="text-red-500 hover:text-red-700 font-medium"
+                                    >
+                                      Remove
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Current Students</Label>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {currentStudents.map((student) => (
-                          <div
-                            key={student.id}
-                            className="flex items-center gap-1 bg-secondary px-2 py-1 rounded-md"
-                          >
-                            <span className="text-sm">{student.name}</span>
-                            <button
-                              aria-label='bell'
-                              type="button"
-                              onClick={() => handleRemoveInitiate(student)}
-                              className="text-muted-foreground hover:text-foreground"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                        {currentStudents.length === 0 && (
-                          <p className="text-sm text-gray-500">No students added yet</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Add Students</Label>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    
+                    {/* Add Students Section */}
+                    <div className="bg-white rounded-lg border p-4">
+                      <h3 className="text-lg font-semibold mb-4">Add Students</h3>
+                      
+                      <div className="relative mb-4">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                          <Search className="h-5 w-5 text-gray-400" />
+                        </div>
                         <Input
                           type="text"
                           placeholder="Search students..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
+                          className="pl-10 w-full"
                         />
                       </div>
-                      <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
-                        {filteredStudents.length > 0 ? (
-                          filteredStudents.map((student) => (
-                            <div
-                              key={student.id}
-                              className="p-2 border rounded hover:bg-secondary cursor-pointer"
-                              onClick={() => handleAddStudent(student)}
-                            >
-                              <p className="font-medium">{student.name}</p>
-                              <p className="text-sm text-gray-500">
-                                {student.grade} - Section {student.section}
-                              </p>
-                            </div>
-                          ))
+                      
+                      {filteredStudents.length === 0 ? (
+                        <p className="text-gray-500 italic">No matching students found</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Name</th>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Grade</th>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Section</th>
+                                <th className="px-4 py-2 text-left font-medium text-gray-600">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredStudents.map((student) => (
+                                <tr key={student.id} className="border-b hover:bg-gray-50">
+                                  <td className="px-4 py-3">{student.name}</td>
+                                  <td className="px-4 py-3">{student.grade}</td>
+                                  <td className="px-4 py-3">Section {student.section}</td>
+                                  <td className="px-4 py-3">
+                                    <button 
+                                      onClick={() => handleAddStudent(student)}
+                                      className="text-green-500 hover:text-green-700 font-medium"
+                                    >
+                                      Add
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Save Button */}
+                    <div className="flex justify-end gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsModalOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="default"
+                        onClick={handleSaveStudents}
+                        disabled={isSaving}
+                        className="gap-2"
+                      >
+                        {isSaving ? (
+                          <>
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-200 border-t-white"></div>
+                            Saving...
+                          </>
                         ) : (
-                          <p className="text-gray-500 text-center py-2">No students found</p>
+                          <>
+                            <Save className="h-4 w-4" />
+                            Save Changes
+                          </>
                         )}
-                      </div>
+                      </Button>
                     </div>
                   </div>
-                )}
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            )}
 
             {showConfirmDialog && (
               <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

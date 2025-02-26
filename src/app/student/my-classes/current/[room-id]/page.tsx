@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import dynamic from 'next/dynamic'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Separator } from "@radix-ui/react-separator";
+import { LessonPlan, TimelineItem } from "@/components/lesson-plan";
 
 // Dynamically import the FaceExpressionRecognition component with no SSR
 const FaceExpressionRecognition = dynamic(
@@ -26,13 +27,43 @@ export default function Page() {
         { icon: "😨", percentage: "0.00", label: "Fearful", bgClass: "bg-gray-100/50" }
     ]);
     
-      const timelineItems = [
-        { time: "8:00AM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-        { time: "9:00AM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-        { time: "10:00AM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-        { time: "2:00PM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." },
-        { time: "3:00PM", title: "What is Java?", desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." }
-      ];
+    const timelineItems: TimelineItem[] = [
+      {
+        time: "10:00 AM - 10:15 AM",
+        title: "Introduction and Overview",
+        desc: "Welcome and introduction to today's topics",
+        completed: true,
+        current: false,
+      },
+      {
+        time: "10:15 AM - 10:35 AM",
+        title: "Control Structures - If/Else",
+        desc: "Understanding conditional logic and decision making in programming",
+        completed: false,
+        current: true,
+      },
+      {
+        time: "10:35 AM - 10:55 AM",
+        title: "Control Structures - Loops",
+        desc: "Exploring for loops, while loops, and iterative processes",
+        completed: false,
+        current: false,
+      },
+      {
+        time: "10:55 AM - 11:20 AM",
+        title: "Practice Exercises",
+        desc: "Hands-on exercises to implement control structures",
+        completed: false,
+        current: false,
+      },
+      {
+        time: "11:20 AM - 11:30 AM",
+        title: "Summary and Assignment",
+        desc: "Recap of key concepts and overview of homework assignment",
+        completed: false,
+        current: false,
+      },
+    ];
 
     const handleExpressionsDetected = (expressions: { [key: string]: number } | null) => {        
         if (expressions) {
@@ -134,36 +165,7 @@ export default function Page() {
                   </CardContent>
                 </Card>
                 
-                <Card className="col-span-1 shadow-lg">
-                  <CardContent className="p-3 sm:p-4 lg:p-6">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-3 sm:mb-4 text-center">Lesson Plan</h2>
-                    <div className="overflow-y-auto max-h-[300px] sm:max-h-[400px] md:max-h-[500px] lg:max-h-[450px]">
-                      <div className="space-y-12 sm:space-y-16 md:space-y-24 lg:space-y-32 px-2 sm:px-4">
-                        {timelineItems.map((item, index) => (
-                          <div key={index} className="relative">
-                            <div className="bg-black text-white px-2 py-1 rounded text-xs sm:text-sm w-fit">
-                              {item.time}
-                            </div>
-                            
-                            <div className="absolute left-12 sm:left-16 md:left-20 lg:left-24 top-0 h-full">
-                              <div className="relative h-full">
-                                <div className="absolute top-3 w-2 h-2 bg-black rounded-full"></div>
-                                {index !== timelineItems.length - 1 && (
-                                  <div className="absolute top-4 left-1 w-0.5 h-[80px] sm:h-[100px] md:h-[125px] lg:h-[153px] bg-black"></div>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <div className="absolute left-20 sm:left-24 md:left-28 lg:left-32 top-1 flex flex-col max-w-[120px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-none">
-                              <span className="text-xs sm:text-sm text-gray-600">{item.title}</span>
-                              <span className="text-xs sm:text-sm text-gray-800 line-clamp-2 sm:line-clamp-3 md:line-clamp-4">{item.desc}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>                                
+                <LessonPlan items={timelineItems} className="col-span-1" />
               </div>
             </div>          
         </div>

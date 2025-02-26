@@ -8,7 +8,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { Separator } from "@radix-ui/react-separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { TopClassesCard } from "@/components/top-classes-card";
 
 export default function Page() {
     // Set initial moods state
@@ -148,60 +148,16 @@ export default function Page() {
                 ))}
               </div>              
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5">
-                <Card className="col-span-1 shadow-lg">
-                  <CardContent className="p-3 sm:p-4">                      
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4 text-start">
-                      Top Completed Classes with Positive Expressions
-                    </h2>
-                    <ScrollArea className="h-[400px] sm:h-[500px] pr-2 sm:pr-4">
-                      <div className="space-y-3 sm:space-y-4">
-                        {completedClasses.map((classItem) => (
-                          <Card key={classItem.id} className="bg-gray-50">
-                            <CardContent className="p-3 sm:p-4">
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
-                                <div>
-                                  <p className="font-medium text-sm sm:text-base">{classItem.name}</p>
-                                  <p className="text-xs sm:text-sm text-gray-600">{classItem.students} students enrolled</p>
-                                </div>
-                                <div className="flex gap-x-2 sm:gap-x-4 text-xs sm:text-sm">
-                                  <span className="flex items-center">😊 {classItem.emotions.happy}%</span>
-                                  <span className="flex items-center">😲 {classItem.emotions.surprised}%</span>
-                                  <span className="flex items-center">😐 {classItem.emotions.neutral}%</span>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-                <Card className="cols-span-3 shadow-lg">
-                  <CardContent className="p-4">
-                    <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-start">Top Current Classes with Positive Expressions</h2>
-                    <ScrollArea className="h-[500px] pr-4">
-                      <div className="space-y-4">
-                        {currentClasses.map((classItem) => (
-                          <Card key={classItem.id} className="bg-gray-50">
-                            <CardContent className="p-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="font-medium">{classItem.name}</p>
-                                  <p className="text-sm text-gray-600">{classItem.students} students enrolled</p>
-                                </div>
-                                <div className="flex gap-x-4 text-sm">
-                                  <span className="flex items-center">😊 {classItem.emotions.happy}%</span>
-                                  <span className="flex items-center">😲 {classItem.emotions.surprised}%</span>
-                                  <span className="flex items-center">😐 {classItem.emotions.neutral}%</span>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>                                
+                <TopClassesCard 
+                  title="Top Completed Classes with Positive Expressions"
+                  classes={completedClasses}
+                  schedule="Schedule: Mon/Wed/Fri 10:00 AM to 12:00 PM"
+                />
+                <TopClassesCard 
+                  title="Top Current Classes with Positive Expressions"
+                  classes={currentClasses}
+                  schedule="Schedule: Tue/Thu 2:00 PM to 4:00 PM"
+                />
               </div>
             </div>          
         </div>
